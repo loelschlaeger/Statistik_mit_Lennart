@@ -1,0 +1,19 @@
+# ignore all
+*
+
+# but not directories
+!*/
+
+# and git files
+!.git*
+
+# and except some file extensions
+!*.apkg
+!*.xlsx
+!*.Rmd
+!*.md
+!*.pdf
+!*.tex
+!*.png
+!*.jpg
+!*.jpeg
