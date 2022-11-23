@@ -1,0 +1,139 @@
+---
+output:
+  beamer_presentation:
+    theme: "Rochester"
+    colortheme: "dove"
+    slide_level: 1
+    latex_engine: lualatex
+classoption: 
+- t 
+#- "handout"
+- "aspectratio=169"
+header-includes:
+- \usepackage[ngerman]{babel}
+- \usepackage{mdframed}
+- \newmdtheoremenv{ndef}{Definition}
+- \newmdtheoremenv{nsatz}{Satz}
+- \def\begincols{\begin{columns}}
+- \def\begincol{\begin{column}}
+- \def\endcol{\end{column}}
+- \def\endcols{\end{columns}}
+- \usepackage{emoji}
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  comment = "#>", 
+  echo = FALSE,
+  fig.width = 5,
+  fig.height = 4
+)
+```
+
+# Ausgangssituation
+
+::: columns
+
+:::: column
+
+Wir haben Daten erhoben:
+
+```{r}
+x <- c(-0.5, -1.5, 0.5, 1.5, 2.5)
+y <- c(-2, -10, 3.5, 4, 12)
+knitr::kable(t(cbind(x,y)), "simple")
+```
+
+\pause
+Fragen: 
+
+\begin{itemize}
+  \item Wie hängen \texttt{x} und \texttt{y} zusammen?
+  \pause
+  \begin{itemize}
+    \item[] Korrelation: \texttt{cor(x,y)} = `r round(cor(x,y),2)`
+    \item[] Positiver Zusammenhang! \emoji{face-with-monocle}
+  \end{itemize}
+  \pause
+  \item Wie können wir einen bestimmten Wert von \texttt{y} vorhersagen?  \emoji{thinking-face}
+  \pause
+  \begin{itemize}
+    \item[] Wir brauchen ein Modell!
+  \end{itemize}
+\end{itemize}
+
+
+::::
+
+:::: column
+\pause
+
+```{r, out.height = "70%"}
+library(ggplot2)
+ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
+  geom_point()
+```
+
+\centerline{Ein lineares Modell scheint passend...}
+::::
+
+:::
+
+# Lineares Modell
+
+$$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$ \pause
+
+\begin{itemize}
+  \item $i$ ist der Index für eine Beobachtung
+  \item $n$ ist die Anzahl Beobachtungen
+  \item $y_i$ ist die abhängige (zu erklärende) Variable für die Beobachtung $i$
+  \item $x_i$ ist der Regressor (die erklärende Variable) für die Beobachtung $i$
+  \item $u_i$ ist der Fehlerterm (der Messfehler) für die Beobachtung $i$
+  \item $\beta_0$ und $\beta_1$ sind unbekannte Parameter, die geschätzt werden
+  \begin{itemize}
+      \item $\beta_0$ ist der Achsenabschnitt (auch Intercept genannt) 
+      \item $\beta_1$ ist der Steigungsparameter
+  \end{itemize}
+\end{itemize}
+
+# Modellannahmen
+
+\small
+\begin{itemize}
+  \item[SLR.1] \pause \textbf{Modell} In der Population hängt die abhängige Variable $y$ von dem Regressor $x$ und dem Fehler $u$ in folgender Form ab: 
+  \begin{equation*}
+      y = \beta_0 + \beta_1 x + u,\quad \beta_0,\ \beta_1 \in \mathbb{R}.
+  \end{equation*}
+  \item[SLR.2] \pause \textbf{Stichprobe} Die Daten $\{(y_i , x_i ), i = 1, \dots, n\}$ sind die Realisation einer Zufallsstichprobe von Zufallsvariablen, die gemäß dem Modell in Annahme SLR.1 generiert wurden.
+  \item[SLR.3] \pause \textbf{Information im Regressor} Die Daten $\{x_i, i=1,\dots,n\}$ sind nicht alle gleich.
+  \item[SLR.4] \pause \textbf{Bedingte Erwartung} Der Erwartungswert des Fehlers $u$ bedingt auf $x$ ist null: 
+  \begin{equation*}
+      \mathbb{E}(u\mid x) = 0.
+  \end{equation*}
+  \item[SLR.5] \pause \textbf{Homoskedastizität} Der Fehler $u$ hat für jeden Wert des Regressors $x$ die gleiche Varianz:
+  \begin{equation*}
+      \text{Var}(u\mid x)=\sigma^2.
+  \end{equation*}
+\end{itemize}
+\normalsize
+
+# Beispiele, bei denen die Annahmen verletzt sind
+
+\small
+\begin{itemize}
+  \item[SLR.1] \pause \textbf{Modell} Der Fehler ist multiplikativ: $y = (\beta_0 + \beta_1 x) u$.
+  \item[SLR.2] \pause \textbf{Stichprobe} 
+  Die Stichprobe ist nicht zufällig aus der Grundgesamtheit der Wahlberechtigten gezogen, weil nur Studierende befragt wurden.
+  \item[SLR.3] \pause \textbf{Information im Regressor} 
+  Das Gehalt soll anhand des Bildungsgrades untersucht werden, die Umfrage wurde aber ausschließlich unter Bachelorabsolventen gemacht. 
+  \item[SLR.4] \pause \textbf{Bedingte Erwartung} 
+  Es besteht ein quadratischer Zusammenhang zwischen $y$ und $x$:
+  \begin{align*}
+      y &= \beta_0 + \beta_1 x + (\beta_2 x^3 + u) \\
+          &= \beta_0 + \beta_1 x + \tilde u
+  \end{align*}
+  Dann gilt: $\mathbb{E}(\tilde u\mid x) = \mathbb{E}(\beta_2 x^3 + u \mid x) = \mathbb{E}(\beta_2 x^3\mid x) + \mathbb{E}(u\mid x) = \beta_2 x^3$
+  \item[SLR.5] \pause \textbf{Homoskedastizität} 
+  Modellierung der Körpergröße in Abhängigkeit des Alters: Die Körpergröße von Neugeborenen (24cm - 57,5cm) hat eine geringere Varianz als die von Erwachsenen (54,6cm - 251cm). 
+\end{itemize}
+\normalsize
