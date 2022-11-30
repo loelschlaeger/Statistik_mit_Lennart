@@ -55,7 +55,7 @@ Fragen:
     \item[] Positiver Zusammenhang! \emoji{face-with-monocle}
   \end{itemize}
   \pause
-  \item Wie können wir einen bestimmten Wert von \texttt{y} vorhersagen?  \emoji{thinking-face}
+  \item Wie können wir einen bestimmten Wert von \texttt{y} vorhersagen?
   \pause
   \begin{itemize}
     \item[] Wir brauchen ein Modell!
@@ -70,8 +70,11 @@ Fragen:
 
 ```{r, out.height = "70%"}
 library(ggplot2)
+beta1_hat <- cov(y,x) / var(x)
+beta0_hat <- mean(y) - beta1_hat * mean(x)
 ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
-  geom_point()
+  geom_point() +
+  geom_abline(slope = beta1_hat, intercept = beta0_hat)
 ```
 
 \centerline{Ein lineares Modell scheint passend...}
@@ -79,10 +82,10 @@ ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
 
 :::
 
-# Lineares Modell
+# Lineares Modell (**S**imple **L**inear **R**egression Model)
 
 $$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$ \pause
-
+\vspace{-0.5cm}
 \begin{itemize}
   \item $i$ ist der Index für eine Beobachtung
   \item $n$ ist die Anzahl Beobachtungen
@@ -96,44 +99,51 @@ $$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$ \pause
   \end{itemize}
 \end{itemize}
 
-# Modellannahmen
+# 5 Modellannahmen
 
+\vspace{-0.5cm}
 \small
-\begin{itemize}
-  \item[SLR.1] \pause \textbf{Modell} In der Population hängt die abhängige Variable $y$ von dem Regressor $x$ und dem Fehler $u$ in folgender Form ab: 
-  \begin{equation*}
-      y = \beta_0 + \beta_1 x + u,\quad \beta_0,\ \beta_1 \in \mathbb{R}.
-  \end{equation*}
-  \item[SLR.2] \pause \textbf{Stichprobe} Die Daten $\{(y_i , x_i ), i = 1, \dots, n\}$ sind die Realisation einer Zufallsstichprobe von Zufallsvariablen, die gemäß dem Modell in Annahme SLR.1 generiert wurden.
-  \item[SLR.3] \pause \textbf{Information im Regressor} Die Daten $\{x_i, i=1,\dots,n\}$ sind nicht alle gleich.
-  \item[SLR.4] \pause \textbf{Bedingte Erwartung} Der Erwartungswert des Fehlers $u$ bedingt auf $x$ ist null: 
-  \begin{equation*}
-      \mathbb{E}(u\mid x) = 0.
-  \end{equation*}
-  \item[SLR.5] \pause \textbf{Homoskedastizität} Der Fehler $u$ hat für jeden Wert des Regressors $x$ die gleiche Varianz:
-  \begin{equation*}
-      \text{Var}(u\mid x)=\sigma^2.
-  \end{equation*}
-\end{itemize}
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lp{2cm}p{4cm}p{5cm}}
+       & Stichwort                         & Annahme & wäre z.B.\ verletzt, wenn... \\ \hline
+ SLR.1 & \textbf{Modell}                   & $y = \beta_0 + \beta_1 x + u$ mit den Parametern $\beta_0,\ \beta_1 \in \mathbb{R}$ & der Zusammenhang ist exponentiell ($y = \beta_0 e^{\beta_1 x} + u$)\\
+ SLR.2 & \textbf{Stichprobe}               & $\{(y_i , x_i ), i = 1, \dots, n\}$ zufällig gemäß SLR.1 generiert & aus der Grundgesamtheit der Wahlberechtigten wurden nur Studierende befragt\\
+ SLR.3 & \textbf{Information im Regressor} & $\text{Var}(x) > 0$ & Experiment immer mit den exakt gleichen Parametern durchgeführt \\
+ SLR.4 & \textbf{Bedingte Erwartung}       & $\mathbb{E}(u\mid x) = 0$ & es gibt einen systematischen Messfehler \\
+ SLR.5 & \textbf{Homoskedastizität}        & $\text{Var}(u\mid x)=\sigma^2$ & die Körpergröße von Kleinkindern hat eine geringere Varianz als die von Erwachsenen\\
+\end{tabular}
+\end{center}
 \normalsize
 
-# Beispiele, bei denen die Annahmen verletzt sind
+# Schätzwerte bestimmen
+
+"Kleinste Quadrate" Methode:
+\begin{align*}
+  {\arg \min}_{\beta_0, \beta_1} \sum_{i = 1}^n (\beta_0 + \beta_1 x_i - y_i)^2
+\end{align*}
+\pause
+Schätzer:
+\begin{align*}
+  \hat\beta_0 &= \bar{Y} - \hat\beta_1 \bar{X} \\
+  \hat\beta_1 &= \frac{\text{Cov}(Y,X)}{\text{Var}(X)}
+\end{align*}
+
+# Mehrere Regressoren (**M**ultiple **L**inear **R**egression Model)
+
+Wir sind nicht auf nur einen Regressor beschränkt:
+
+$$y_i = \beta_0 + \beta_1 x_{i,1} + \ldots + \beta_K x_{i,K} + u_i, \quad i = 1,\dots,n$$
+\pause Wir werden uns anschauen:
 
 \small
-\begin{itemize}
-  \item[SLR.1] \pause \textbf{Modell} Der Fehler ist multiplikativ: $y = (\beta_0 + \beta_1 x) u$.
-  \item[SLR.2] \pause \textbf{Stichprobe} 
-  Die Stichprobe ist nicht zufällig aus der Grundgesamtheit der Wahlberechtigten gezogen, weil nur Studierende befragt wurden.
-  \item[SLR.3] \pause \textbf{Information im Regressor} 
-  Das Gehalt soll anhand des Bildungsgrades untersucht werden, die Umfrage wurde aber ausschließlich unter Bachelorabsolventen gemacht. 
-  \item[SLR.4] \pause \textbf{Bedingte Erwartung} 
-  Es besteht ein quadratischer Zusammenhang zwischen $y$ und $x$:
-  \begin{align*}
-      y &= \beta_0 + \beta_1 x + (\beta_2 x^3 + u) \\
-          &= \beta_0 + \beta_1 x + \tilde u
-  \end{align*}
-  Dann gilt: $\mathbb{E}(\tilde u\mid x) = \mathbb{E}(\beta_2 x^3 + u \mid x) = \mathbb{E}(\beta_2 x^3\mid x) + \mathbb{E}(u\mid x) = \beta_2 x^3$
-  \item[SLR.5] \pause \textbf{Homoskedastizität} 
-  Modellierung der Körpergröße in Abhängigkeit des Alters: Die Körpergröße von Neugeborenen (24cm - 57,5cm) hat eine geringere Varianz als die von Erwachsenen (54,6cm - 251cm). 
-\end{itemize}
+- Wie verändern sich die Annahmen?
+- Wie werden hier die Parameter geschätzt? Und was bedeutet \textit{teris paribus}? 
+- Was ist die Normalgleichung? Und was bedeutet Multikollinearität?
+- Wie führt man eine multiple Regression in \texttt{R} durch? Wie interpretiert man den \texttt{R} Output?
+- Und ganz wichtig: Was besagt das Gauss-Markov-Theorem?
 \normalsize
+
+\vfill
+
+\hfill Mehr dazu nächste Woche! \emoji{thumbs-up}
