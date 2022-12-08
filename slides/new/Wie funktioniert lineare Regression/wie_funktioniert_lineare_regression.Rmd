@@ -41,6 +41,9 @@ Wir haben Daten erhoben:
 ```{r}
 x <- c(-0.5, -1.5, 0.5, 1.5, 2.5)
 y <- c(-2, -10, 3.5, 4, 12)
+beta1_hat <- cov(y,x) / var(x)
+beta0_hat <- mean(y) - beta1_hat * mean(x)
+reg <- function(x) beta0_hat + beta1_hat * x
 knitr::kable(t(cbind(x,y)), "simple")
 ```
 
@@ -70,8 +73,6 @@ Fragen:
 
 ```{r, out.height = "70%"}
 library(ggplot2)
-beta1_hat <- cov(y,x) / var(x)
-beta0_hat <- mean(y) - beta1_hat * mean(x)
 ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
   geom_point() +
   geom_abline(slope = beta1_hat, intercept = beta0_hat)
@@ -84,22 +85,47 @@ ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
 
 # Lineares Modell (**S**imple **L**inear **R**egression Model)
 
-$$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$ \pause
-\vspace{-0.5cm}
+::: columns
+
+:::: column
+$$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$
+::::
+
+:::: column
+\vspace{-1cm}
+\begin{center}
+```{r, out.height = "55%"}
+library(latex2exp)
+ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
+  geom_point(alpha = 0) +
+  geom_abline(slope = beta1_hat, intercept = beta0_hat) +
+  geom_hline(yintercept = 0) +
+  geom_vline(xintercept = 0) +
+  annotate("text", x = 0, y = beta0_hat, label = TeX("$\\beta_0$"))
+```
+\end{center}
+::::
+\pause
+:::
+\vspace{-1.7cm}
+\small
 \begin{itemize}
   \item $i$ ist der Index für eine Beobachtung
   \item $n$ ist die Anzahl Beobachtungen
   \item $y_i$ ist die abhängige (zu erklärende) Variable für die Beobachtung $i$
   \item $x_i$ ist der Regressor (die erklärende Variable) für die Beobachtung $i$
   \item $u_i$ ist der Fehlerterm (der Messfehler) für die Beobachtung $i$
-  \item $\beta_0$ und $\beta_1$ sind unbekannte Parameter, die geschätzt werden
-  \begin{itemize}
+  \pause
+  \[
+  \left.\parbox{0.57\textwidth}{
       \item $\beta_0$ ist der Achsenabschnitt (auch Intercept genannt) 
       \item $\beta_1$ ist der Steigungsparameter
-  \end{itemize}
+  }\right\} \text{ Parameter, die wir schätzen wollen}
+  \]
 \end{itemize}
+\normalsize
 
-# 5 Modellannahmen
+# Modellannahmen
 
 \vspace{-0.5cm}
 \small
@@ -118,32 +144,84 @@ $$y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n$$ \pause
 
 # Schätzwerte bestimmen
 
+::: columns
+
+:::: column
 "Kleinste Quadrate" Methode:
 \begin{align*}
-  {\arg \min}_{\beta_0, \beta_1} \sum_{i = 1}^n (\beta_0 + \beta_1 x_i - y_i)^2
+  {\arg \min}_{\hat\beta_0, \hat\beta_1} \sum_{i = 1}^n (\underbrace{y_i - \underbrace{\hat\beta_0 + \hat\beta_1 x_i}_{\text{Vorhersage } \hat y_i}}_{\text{Residuum } \hat u_i})^2
 \end{align*}
-\pause
+
 Schätzer:
 \begin{align*}
   \hat\beta_0 &= \bar{Y} - \hat\beta_1 \bar{X} \\
   \hat\beta_1 &= \frac{\text{Cov}(Y,X)}{\text{Var}(X)}
 \end{align*}
+::::
+
+:::: column
+```{r, out.height = "70%"}
+ggplot(data = data.frame(x, y), aes(x = x, y = y)) +
+  geom_point() +
+  geom_abline(slope = beta1_hat, intercept = beta0_hat)
+```
+::::
+
+:::
 
 # Mehrere Regressoren (**M**ultiple **L**inear **R**egression Model)
 
-Wir sind nicht auf nur einen Regressor beschränkt:
+Statt einem können wir uns auch $K$ Regressoren gleichzeitig anschauen:
 
 $$y_i = \beta_0 + \beta_1 x_{i,1} + \ldots + \beta_K x_{i,K} + u_i, \quad i = 1,\dots,n$$
-\pause Wir werden uns anschauen:
 
+Wie werden die Parameter interpretiert?
+
+\begin{itemize}
+  \item Achsenabschnitt $\beta_0$: 
+  \begin{itemize}
+    \item[] Welches $y$ erwarten wir, wenn alle Regressoren Null sind?
+  \end{itemize}
+  \item Steigungsparameter $\beta_k$, $k = 1,\dots,K$:
+  \begin{itemize}
+    \item[] Wie verändert sich $y$, wenn sich $x_k$ um eine Einheit verändert und alle anderen Regressoren konstant gehalten werden? (ceteris paribus Analyse)
+  \end{itemize}
+\end{itemize}
+
+# Welche Annahmen treffen wir?
+
+\vspace{-0.5cm}
 \small
-- Wie verändern sich die Annahmen?
-- Wie werden hier die Parameter geschätzt? Und was bedeutet \textit{teris paribus}? 
-- Was ist die Normalgleichung? Und was bedeutet Multikollinearität?
-- Wie führt man eine multiple Regression in \texttt{R} durch? Wie interpretiert man den \texttt{R} Output?
-- Und ganz wichtig: Was besagt das Gauss-Markov-Theorem?
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lp{4cm}p{7cm}}
+       & Stichwort                         & Annahme  \\ \hline
+ MLR.1 & \textbf{Modell}                   & $y = \beta_0 + \beta_1 x_1 + \dots + \beta_K x_K + u$ mit den Parametern $\beta_0,\ \beta_1, \dots, \beta_K\ \in \mathbb{R}$ \\
+ MLR.2 & \textbf{Stichprobe}               & $\{(y_i , x_{1,i}, \dots, x_{K,i} ), i = 1, \dots, n\}$ zufällig gemäß MLR.1 generiert \\
+ MLR.3 & \textbf{Information im Regressor} & $\text{Var}(x_k) > 0$ für alle $k=1,\dots,K$  \\
+ MLR.4 & \textbf{Bedingte Erwartung}       & $\mathbb{E}(u\mid x_1,\dots,x_K) = 0$  \\
+ MLR.5 & \textbf{Homoskedastizität}        & $\text{Var}(u\mid x_1,\dots,x_K)=\sigma^2$ \\
+\end{tabular}
+\end{center}
 \normalsize
 
-\vfill
+# Wie werden die Parameter geschätzt?
 
-\hfill Mehr dazu nächste Woche! \emoji{thumbs-up}
+- Was ist die Normalgleichung? Und was bedeutet Multikollinearität?
+
+
+# Unser Programm:
+
+Heute:
+
+- Wie führt man eine (multiple) lineare Regression in \texttt{R} durch? 
+- Wie interpretiert man den \texttt{R} Output einer (multiplen) linearen Regression?
+
+
+Nächste Woche:
+
+- Wovon hängt die Varianz der Schätzer im MLR Modell ab?
+- Was besagt das Gauss-Markov-Theorem?
+- Was ist der Unterschied zwischen Korrelation und Kausalität?
+
+

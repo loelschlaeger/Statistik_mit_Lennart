@@ -1,0 +1,319 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+  ignorenonframetext,
+  t,
+  aspectratio=169]{beamer}
+\usepackage{pgfpages}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{: }
+\setbeamercolor{caption name}{fg=normal text.fg}
+\beamertemplatenavigationsymbolsempty
+% Prevent slide breaks in the middle of a paragraph
+\widowpenalties 1 10000
+\raggedbottom
+\setbeamertemplate{part page}{
+  \centering
+  \begin{beamercolorbox}[sep=16pt,center]{part title}
+    \usebeamerfont{part title}\insertpart\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{section page}{
+  \centering
+  \begin{beamercolorbox}[sep=12pt,center]{part title}
+    \usebeamerfont{section title}\insertsection\par
+  \end{beamercolorbox}
+}
+\setbeamertemplate{subsection page}{
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center]{part title}
+    \usebeamerfont{subsection title}\insertsubsection\par
+  \end{beamercolorbox}
+}
+\AtBeginPart{
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \ifbibliography
+  \else
+    \frame{\sectionpage}
+  \fi
+}
+\AtBeginSubsection{
+  \frame{\subsectionpage}
+}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usetheme[]{Rochester}
+\usecolortheme{dove}
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
+\newif\ifbibliography
+\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+\usepackage{caption}
+% Make caption package work with longtable
+\makeatletter
+\def\fnum@table{\tablename~\thetable}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage[ngerman]{babel}
+\usepackage{mdframed}
+\newmdtheoremenv{ndef}{Definition}
+\newmdtheoremenv{nsatz}{Satz}
+\def\begincols{\begin{columns}}
+\def\begincol{\begin{column}}
+\def\endcol{\end{column}}
+\def\endcols{\end{columns}}
+\usepackage{emoji}
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\begin{frame}{Ausgangssituation}
+\protect\hypertarget{ausgangssituation}{}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+Wir haben Daten erhoben:
+
+\begin{longtable}[]{@{}lrrrrr@{}}
+\toprule
+\endhead
+x & -0.5 & -1.5 & 0.5 & 1.5 & 2.5 \\
+y & -2.0 & -10.0 & 3.5 & 4.0 & 12.0 \\
+\bottomrule
+\end{longtable}
+
+\pause
+
+Fragen:
+
+\begin{itemize}
+  \item Wie hängen \texttt{x} und \texttt{y} zusammen?
+  \pause
+  \begin{itemize}
+    \item[] Korrelation: \texttt{cor(x,y)} = 0.97
+    \item[] Positiver Zusammenhang! \emoji{face-with-monocle}
+  \end{itemize}
+  \pause
+  \item Wie können wir einen bestimmten Wert von \texttt{y} vorhersagen?
+  \pause
+  \begin{itemize}
+    \item[] Wir brauchen ein Modell!
+  \end{itemize}
+\end{itemize}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\pause
+
+\includegraphics[height=0.7\textheight]{wie_funktioniert_lineare_regression_files/figure-beamer/unnamed-chunk-3-1}
+
+\centerline{Ein lineares Modell scheint passend...}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Lineares Modell (\textbf{S}imple \textbf{L}inear
+\textbf{R}egression Model)}
+\protect\hypertarget{lineares-modell-simple-linear-regression-model}{}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+\[y_i = \beta_0 + \beta_1 x_i + u_i, \quad i = 1,\dots,n\]
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\vspace{-1cm}
+\begin{center}
+
+```
+#> Warning: Paket 'latex2exp' wurde unter R Version 4.2.2 erstellt
+```
+
+```
+#> Warning in is.na(x): is.na() auf Nicht-(Liste oder Vektor) des Typs 'expression'
+#> angewendet
+```
+
+
+\includegraphics[height=0.55\textheight]{wie_funktioniert_lineare_regression_files/figure-beamer/unnamed-chunk-4-1} 
+\end{center}
+\end{column}
+
+\pause
+\end{columns}
+
+\vspace{-1.7cm}
+\small
+\begin{itemize}
+  \item $i$ ist der Index für eine Beobachtung
+  \item $n$ ist die Anzahl Beobachtungen
+  \item $y_i$ ist die abhängige (zu erklärende) Variable für die Beobachtung $i$
+  \item $x_i$ ist der Regressor (die erklärende Variable) für die Beobachtung $i$
+  \item $u_i$ ist der Fehlerterm (der Messfehler) für die Beobachtung $i$
+  \pause
+  \[
+  \left.\parbox{0.57\textwidth}{
+      \item $\beta_0$ ist der Achsenabschnitt (auch Intercept genannt) 
+      \item $\beta_1$ ist der Steigungsparameter
+  }\right\} \text{ Parameter, die wir schätzen wollen}
+  \]
+\end{itemize}
+\normalsize
+\end{frame}
+
+\begin{frame}{Modellannahmen}
+\protect\hypertarget{modellannahmen}{}
+\vspace{-0.5cm}
+\small
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lp{2cm}p{4cm}p{5cm}}
+       & Stichwort                         & Annahme & wäre z.B.\ verletzt, wenn... \\ \hline
+ SLR.1 & \textbf{Modell}                   & $y = \beta_0 + \beta_1 x + u$ mit den Parametern $\beta_0,\ \beta_1 \in \mathbb{R}$ & der Zusammenhang ist exponentiell ($y = \beta_0 e^{\beta_1 x} + u$)\\
+ SLR.2 & \textbf{Stichprobe}               & $\{(y_i , x_i ), i = 1, \dots, n\}$ zufällig gemäß SLR.1 generiert & aus der Grundgesamtheit der Wahlberechtigten wurden nur Studierende befragt\\
+ SLR.3 & \textbf{Information im Regressor} & $\text{Var}(x) > 0$ & Experiment immer mit den exakt gleichen Parametern durchgeführt \\
+ SLR.4 & \textbf{Bedingte Erwartung}       & $\mathbb{E}(u\mid x) = 0$ & es gibt einen systematischen Messfehler \\
+ SLR.5 & \textbf{Homoskedastizität}        & $\text{Var}(u\mid x)=\sigma^2$ & die Körpergröße von Kleinkindern hat eine geringere Varianz als die von Erwachsenen\\
+\end{tabular}
+\end{center}
+\normalsize
+\end{frame}
+
+\begin{frame}{Schätzwerte bestimmen}
+\protect\hypertarget{schuxe4tzwerte-bestimmen}{}
+\begin{columns}[T]
+\begin{column}{0.48\textwidth}
+``Kleinste Quadrate'' Methode: \begin{align*}
+  {\arg \min}_{\hat\beta_0, \hat\beta_1} \sum_{i = 1}^n (\underbrace{y_i - \underbrace{\hat\beta_0 + \hat\beta_1 x_i}_{\text{Vorhersage } \hat y_i}}_{\text{Residuum } \hat u_i})^2
+\end{align*}
+
+Schätzer: \begin{align*}
+  \hat\beta_0 &= \bar{Y} - \hat\beta_1 \bar{X} \\
+  \hat\beta_1 &= \frac{\text{Cov}(Y,X)}{\text{Var}(X)}
+\end{align*}
+\end{column}
+
+\begin{column}{0.48\textwidth}
+\includegraphics[height=0.7\textheight]{wie_funktioniert_lineare_regression_files/figure-beamer/unnamed-chunk-5-1}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Mehrere Regressoren (\textbf{M}ultiple \textbf{L}inear
+\textbf{R}egression Model)}
+\protect\hypertarget{mehrere-regressoren-multiple-linear-regression-model}{}
+Statt einem können wir uns auch \(K\) Regressoren gleichzeitig
+anschauen:
+
+\[y_i = \beta_0 + \beta_1 x_{i,1} + \ldots + \beta_K x_{i,K} + u_i, \quad i = 1,\dots,n\]
+
+Wie werden die Parameter interpretiert?
+
+\begin{itemize}
+  \item Achsenabschnitt $\beta_0$: 
+  \begin{itemize}
+    \item[] Welches $y$ erwarten wir, wenn alle Regressoren Null sind?
+  \end{itemize}
+  \item Steigungsparameter $\beta_k$, $k = 1,\dots,K$:
+  \begin{itemize}
+    \item[] Wie verändert sich $y$, wenn sich $x_k$ um eine Einheit verändert und alle anderen Regressoren konstant gehalten werden? (ceteris paribus Analyse)
+  \end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Welche Annahmen treffen wir?}
+\protect\hypertarget{welche-annahmen-treffen-wir}{}
+\vspace{-0.5cm}
+\small
+\begin{center}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{lp{4cm}p{7cm}}
+       & Stichwort                         & Annahme  \\ \hline
+ MLR.1 & \textbf{Modell}                   & $y = \beta_0 + \beta_1 x_1 + \dots + \beta_K x_K + u$ mit den Parametern $\beta_0,\ \beta_1, \dots, \beta_K\ \in \mathbb{R}$ \\
+ MLR.2 & \textbf{Stichprobe}               & $\{(y_i , x_{1,i}, \dots, x_{K,i} ), i = 1, \dots, n\}$ zufällig gemäß MLR.1 generiert \\
+ MLR.3 & \textbf{Information im Regressor} & $\text{Var}(x_k) > 0$ für alle $k=1,\dots,K$  \\
+ MLR.4 & \textbf{Bedingte Erwartung}       & $\mathbb{E}(u\mid x_1,\dots,x_K) = 0$  \\
+ MLR.5 & \textbf{Homoskedastizität}        & $\text{Var}(u\mid x_1,\dots,x_K)=\sigma^2$ \\
+\end{tabular}
+\end{center}
+\normalsize
+\end{frame}
+
+\begin{frame}{Wie werden die Parameter geschätzt?}
+\protect\hypertarget{wie-werden-die-parameter-geschuxe4tzt}{}
+\begin{itemize}
+\tightlist
+\item
+  Was ist die Normalgleichung? Und was bedeutet Multikollinearität?
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Unser Programm:}
+\protect\hypertarget{unser-programm}{}
+Heute:
+
+\begin{itemize}
+\tightlist
+\item
+  Wie führt man eine (multiple) lineare Regression in \texttt{R} durch?
+\item
+  Wie interpretiert man den \texttt{R} Output einer (multiplen) linearen
+  Regression?
+\end{itemize}
+
+Nächste Woche:
+
+\begin{itemize}
+\tightlist
+\item
+  Wovon hängt die Varianz der Schätzer im MLR Modell ab?
+\item
+  Was besagt das Gauss-Markov-Theorem?
+\item
+  Was ist der Unterschied zwischen Korrelation und Kausalität?
+\end{itemize}
+\end{frame}
+
+\end{document}
